@@ -280,7 +280,7 @@ app.get("/api/generate-card/:userId", async (req, res) => {
 
       // Draw user photo in the left side box marked "PHOTO" in the template
       // Adjust these coordinates to match the photo placement in the template
-      ctx.drawImage(userPhoto, 85, 200, 165, 195); // These coordinates place the photo in the left box
+      ctx.drawImage(userPhoto, 45, 200, 155, 195); // These coordinates place the photo in the left box
     }
 
     // Set font for all text
@@ -290,67 +290,67 @@ app.get("/api/generate-card/:userId", async (req, res) => {
     const memberId = user.member_no || user.id.toString().padStart(6, "0");
 
     // Left side data (personal details) - Matching template order
-    ctx.fillText(memberId, 490, 237); // Member ID (உறுப்பினர் எண்)
-    ctx.fillText(user.full_name, 490, 271); // Name (பெயர்)
-    ctx.fillText(user.father_name || "N/A", 490, 305); // Father's name (தந்தை கணவர் பெயர்)
-    ctx.fillText(formatDate(user.dob) || "N/A", 490, 339); // Date of birth (பிறந்த தேதி)
-    ctx.fillText(user.blood_group || "N/A", 490, 373); // Blood group (இரத்தம் வகை)
+    ctx.fillText(memberId, 455, 238); // Member ID (உறுப்பினர் எண்)
+    ctx.fillText(user.full_name, 455, 272); // Name (பெயர்)
+    ctx.fillText(user.father_name || "N/A", 455, 306); // Father's name (தந்தை கணவர் பெயர்)
+    ctx.fillText(formatDate(user.dob) || "N/A", 455, 340); // Date of birth (பிறந்த தேதி)
+    ctx.fillText(user.blood_group || "N/A", 455, 374); // Blood group (இரத்தம் வகை)
 
     // Right side data - Matching template order based on the image
-    ctx.fillText(user.education || "N/A", 920, 62); // Education (கல்வி)
-    ctx.fillText(user.occupation || "N/A", 920, 97); // Occupation (தொழில்)
+    ctx.fillText(user.education || "N/A", 912, 62); // Education (கல்வி)
+    ctx.fillText(user.phone || "N/A", 912, 97); // Mobile number (அலைபேசி எண்)
 
     // Additional fields on the right side following template order
-    ctx.fillText(user.phone || "N/A", 920, 128); // Mobile number (அலைபேசி எண்)
-    ctx.fillText(user.voter_id || "N/A", 920, 202); // Voter ID (வாக்காளர் அடை எண்)
-    ctx.fillText(user.aadhar || "N/A", 920, 237); // Aadhar number (ஆதார் எண்)
-    ctx.fillText(user.email || "N/A", 920, 268); // Email (மின்னஞ்சல்)
+    ctx.fillText(user.email || "N/A", 912, 128); // Email (மின்னஞ்சல்)
+    // ctx.fillText(user.voter_id || "N/A", 912, 202); // Voter ID (வாக்காளர் அடை எண்)
+    // ctx.fillText(user.aadhar || "N/A", 912, 237); // Aadhar number (ஆதார் எண்)
+    // ctx.fillText(user.email || "N/A", 912, 268); // Email (மின்னஞ்சல்)
 
     // Handle address with word wrapping
-    if (user.address) {
-      const maxWidth = 400; // Maximum width for text before wrapping
-      const lineHeight = 28; // Space between lines
-      const words = user.address.split(" ");
-      let line = "";
-      let y = 305; // Starting y position for the address adjusted to 300
+if (user.address) {
+  const maxWidth = 400; // Maximum width for text before wrapping
+  const lineHeight = 28; // Space between lines
+  const words = user.address.split(" ");
+  let line = "";
+  let y = 165; // Starting y position for the address
 
-      for (let i = 0; i < words.length; i++) {
-        const testLine = line + words[i] + " ";
-        const metrics = ctx.measureText(testLine);
-        const testWidth = metrics.width;
+  for (let i = 0; i < words.length; i++) {
+    const testLine = line + words[i] + " ";
+    const metrics = ctx.measureText(testLine);
+    const testWidth = metrics.width;
 
-        if (testWidth > maxWidth && i > 0) {
-          ctx.fillText(line, 920, y);
-          line = words[i] + " ";
-          y += lineHeight;
+    if (testWidth > maxWidth && i > 0) {
+      ctx.fillText(line, 912, y);
+      line = words[i] + " ";
+      y += lineHeight;
 
-          // Check if we're going too far down (adjusted max y value based on new starting point)
-          if (y > 385) {
-            // Increased from 180 to match the new starting point
-            line += "...";
-            ctx.fillText(line, 920, y);
-            break;
-          }
-        } else {
-          line = testLine;
-        }
-      }
-
-      // Don't forget to draw the last line (adjusted check value)
-      if (y <= 385) {
-        // Increased from 180 to match the new starting point
-        ctx.fillText(line, 920, y);
+      // Check if we're going too far down (adjusted max y value based on new starting point)
+      if (y > 245) {
+        // Adjusted from 385 to 245 to match the new starting point (165 + ~80px max height)
+        line += "...";
+        ctx.fillText(line, 912, y);
+        break;
       }
     } else {
-      ctx.fillText("N/A", 920, 305); // Adjusted to match the new starting position
+      line = testLine;
     }
+  }
+
+  // Don't forget to draw the last line (adjusted check value)
+  if (y <= 245) {
+    // Adjusted from 385 to 245 to match the new starting point
+    ctx.fillText(line, 912, y);
+  }
+} else {
+  ctx.fillText("N/A", 912, 165); // Adjusted to match the new starting position
+}
 
     // Generate QR code for the member ID
     // First, create a QR code data URL using qrcode library
     const qrCodeDataURL = await QRCode.toDataURL(memberId, {
       errorCorrectionLevel: "H",
       margin: 1,
-      width: 150,
+      width: 75,
       color: {
         dark: "#000000",
         light: "#ffffff",
@@ -361,7 +361,7 @@ app.get("/api/generate-card/:userId", async (req, res) => {
     const qrCodeImage = await loadImage(qrCodeDataURL);
 
     // Adjust these values to fit your exact template
-    ctx.drawImage(qrCodeImage, 1180, 40, 180, 180);
+    ctx.drawImage(qrCodeImage, 1250, 25, 140, 150);
 
     // Convert canvas to buffer
     const buffer = canvas.toBuffer("image/png");
